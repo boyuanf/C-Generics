@@ -1,0 +1,1 @@
+<Playlist Version="1.0"><Add Test="CollectIt.Tests.ListTests.A_List_Can_Insert" /><Add Test="CollectIt.Tests.ListTests.A_List_Can_Find" /><Add Test="CollectIt.Tests.ListTests.A_List_Can_Remove" /></Playlist>
