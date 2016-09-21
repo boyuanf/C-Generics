@@ -6,6 +6,38 @@ using System.Threading.Tasks;
 
 namespace CollectIt
 {
+    public class EmployeeComparer : IEqualityComparer<Employee>, IComparer<Employee>
+    {
+        public bool Equals(Employee x, Employee y)
+        {
+            return String.Equals(x.Name, y.Name);
+        }
+
+        public int GetHashCode(Employee obj)
+        {
+            return obj.Name.GetHashCode();
+        }
+
+        public int Compare(Employee x, Employee y)
+        {
+            return String.CompareOrdinal(x.Name, y.Name);
+        }
+    }
+
+    public class DepartmentCollection :
+        SortedDictionary<string, SortedSet<Employee>>
+    {
+        public DepartmentCollection Add(String departmentName, Employee employee)
+        {
+            if (!ContainsKey(departmentName))
+            {
+                Add(departmentName, new SortedSet<Employee>(new EmployeeComparer()));
+            }
+            this[departmentName].Add(employee);
+            return this;
+        }
+    }
+
     class Program
     {
         static void Main(string[] args)
@@ -15,6 +47,63 @@ namespace CollectIt
             //LearnStack();
             //LearnHashSet();
             //Dictionary<string, Employee> employeesByName = new Dictionary<string, Employee>();
+
+            var departments = new DepartmentCollection();
+
+            departments.Add("Engineering",
+                new SortedSet<Employee>(new EmployeeComparer())
+                {
+                    new Employee(){Name = "scott"},
+                    new Employee(){Name = "Alex"}
+                });
+            departments["Engineering"].Add(new Employee() { Name = "Alex" });
+
+            departments.Add("Sales", new SortedSet<Employee>(new EmployeeComparer()));
+            departments["Sales"].Add(new Employee() { Name = "Leet" });
+            departments["Sales"].Add(new Employee() { Name = "Fance" });
+            departments["Sales"].Add(new Employee() { Name = "Mary" });
+
+            foreach (var item in departments)
+            {
+                Console.WriteLine("Department name: {0}", item.Key);
+                foreach (var employee in item.Value)
+                {
+                    Console.WriteLine("\t" + employee.Name);
+                }
+            }
+
+        }
+
+        private static void DictionaryContainHashSet()
+        {
+            var departments = new SortedDictionary<string, HashSet<Employee>>();
+
+            departments.Add("Engineering",
+                new HashSet<Employee>(new EmployeeComparer())
+                {
+                    new Employee(){Name = "scott"},
+                    new Employee(){Name = "Alex"}
+                });
+            departments["Engineering"].Add(new Employee() { Name = "Alex" });
+
+            departments.Add("Sales", new HashSet<Employee>(new EmployeeComparer()));
+            departments["Sales"].Add(new Employee() { Name = "Leet" });
+            departments["Sales"].Add(new Employee() { Name = "Fance" });
+            departments["Sales"].Add(new Employee() { Name = "Mary" });
+
+            foreach (var item in departments)
+            {
+                Console.WriteLine("Department name: {0}", item.Key);
+                foreach (var employee in item.Value)
+                {
+                    Console.WriteLine("\t" + employee.Name);
+                }
+            }
+        }
+
+
+        private static void LearnDictionary()
+        {
             var employeesByName = new Dictionary<string, Employee>();
 
             employeesByName.Add("Scott", new Employee() { Name = "scott" });
@@ -27,37 +116,32 @@ namespace CollectIt
 
             foreach (var item in employeesByName)
             {
-                Console.WriteLine("{0}:{1}",item.Key,item.Value.Name);
+                Console.WriteLine("{0}:{1}", item.Key, item.Value.Name);
             }
 
-            var employeesByDepartment=new Dictionary<string,List<Employee>>();
-            employeesByDepartment.Add("Engineering",
+
+            var departments = new Dictionary<string, List<Employee>>();
+            departments.Add("Engineering",
                 new List<Employee>()
                 {
                     new Employee(){Name = "scott"},
                     new Employee(){Name = "Alex"}
                 });
-            employeesByDepartment["Engineering"].Add(new Employee(){Name = "Joe"});
+            departments["Engineering"].Add(new Employee() { Name = "Joe" });
 
-            foreach (var item in employeesByDepartment)
+            departments.Add("Sales", new List<Employee>());
+            departments["Sales"].Add(new Employee() { Name = "Leet" });
+            departments["Sales"].Add(new Employee() { Name = "Fance" });
+            departments["Sales"].Add(new Employee() { Name = "Mary" });
+
+            foreach (var item in departments)
             {
-                Console.WriteLine("Department name: {0}",item.Key);
+                Console.WriteLine("Department name: {0}", item.Key);
                 foreach (var employee in item.Value)
                 {
-                    Console.WriteLine(employee.Name);
+                    Console.WriteLine("\t" + employee.Name);
                 }
             }
-
-            var employeesByNameSort = new SortedDictionary<string,List<Employee>>();
-
-            employeesByNameSort.Add("Sales", new List<Employee>() { new Employee(), new Employee(), new Employee() });
-            employeesByNameSort.Add("Engineer", new List<Employee>() { new Employee(), new Employee() });
-
-            foreach (var item in employeesByNameSort)
-            {
-                Console.WriteLine("count of employees for {0} is {1}", item.Key,item.Value.Count);
-            }
-
         }
 
         private static void LearnHashSet()
